@@ -24,6 +24,9 @@ Pista: ¡No dejes descriptores de archivo abiertos!*/
 #include <unistd.h>
 int    ft_popen(const char *file, char *const argv[], int type)
 {
+	if((type != "w" && type != "r") || !argv || !file)
+		return(-1);
+	
 	//necesitas crear los fd correspondientes para controlarlos con la funcion pipe
 }
 

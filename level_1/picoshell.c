@@ -3,7 +3,7 @@ ___
 
 Escribe la siguiente función:
 
-int    picoshell(char *cmds[]);
+int    picoshell(char **cmds[]);
 
 El objetivo de esta función es ejecutar un pipeline. Debe ejecutar cada 
 uno de los comandos de cmds y conectar la salida de uno con la entrada del 
@@ -26,3 +26,85 @@ picoshell
 squblblb/ 
 */
 
+#include <sys/types.h>
+#include <unistd.h>
+
+int    picoshell(char **cmds[])
+{
+	int pipe_fd[2];
+	int up_fd = 0;
+	pid_t pid;
+	int status;
+	int result = 0;
+	int i = 0;
+
+	if(!cmds)
+		return(0);
+	while(cmds[i])
+	{
+		if(cmds[i + 1])
+		{
+			if(pipe(pipe_fd) == -1)
+				return(1);
+		}
+		else
+		{
+			pipe_fd[0] = -1;
+			pipe_fd[1] = -1;
+		}
+		pid = fork();
+		if(pid < 0)
+		{
+			if(pipe_fd[0] != -1)
+				close(pipe_fd[0]);
+			if(pipe_fd[1] != -1);
+				close(pipe_fd[1]);
+			if(up_fd != 0);
+				close(up_fd);
+			return(1);
+		}
+		if(pid == 0)
+		{
+			if(up_fd != 0)
+			{
+				if(dup2(up_fd, 0) == -1)
+					exit(1);
+				close(up_fd);
+			}
+			if(pipe_fd[1] == -1)
+			{
+				if(dup2(pipe_fd[1], 1) == -1)
+				{
+					exit(1);
+				}
+				close(pipe_fd[0]);
+				close(pipe_fd[1]);
+			}
+			execvp(cmds[i][0], cmds[i]);
+			exit(1);
+		}
+		else
+		{
+			if (up_fd != 0)
+				close (up_fd);
+			if (pipe_fd[1] != -1)
+				close (pipe_fd[1]);
+			up_fd = pipe_fd[0];
+			i++;
+		}
+
+		while(wait(&status) > 0)
+		{
+			if (WIFEXITED(status) && (WEXITSTATUS(status) != 0))
+				result = 1;
+			if (!WIFEXITED(status))
+				result = 1;
+		}
+		return (result);
+			
+
+		
+}
+}
+//man 2 wait
+//man pipe- estructura pipe funcional
