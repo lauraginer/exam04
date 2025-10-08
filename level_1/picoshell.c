@@ -101,9 +101,6 @@ int    picoshell(char **cmds[])
 				result = 1;
 		}
 		return (result);
-			
-
-		
 }
 }
 //man 2 wait
