@@ -27,19 +27,30 @@ int    picoshell(char **cmds[])
 	int i = 0;
 	int status;
 	int result;
-	int up_fd = 0; //valor copiado del pipe_df[0], lo utilizamos en el proceso padre
+	int up_fd = 0; //extremo de lectura (fd[0]) del comando anterior
 
-	if(!cmds)
-		return(1); //creo que deberia de retornar 1 segun el subject
 	while(cmds[i])
 	{
-		if(cmds[i + 1])
-		
-		//necesitamos este bucle para recorrer los comandos y crear el pipe como tal
+		if(cmds[i + 1]) //si existe un segundo comando, creamos entonces el pipe
+		{
+			if(pipe(pipe_fd) == -1)
+				return(1);
+		}
+		else //si no existe (es el último), añadimos este valor como flag para gestionar luego
+		{
+			pipe_fd[0] = -1;
+			pipe_fd[1] = -1;
+		}
 		pid = fork;
 		if(pid < 0)
 		{
-
+			if(pipe_fd[0] != -1)
+				close(pipe_fd[0]);
+			if(pipe_fd[1] != -1)
+				close(pipe_fd[1]);
+			if(up_fd != 0)
+				close(up_fd);
+			return(1);
 		}
 		if(pid == 0)//proceso hijo
 		{

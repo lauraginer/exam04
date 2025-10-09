@@ -38,8 +38,6 @@ int    picoshell(char **cmds[])
 	int result = 0;
 	int i = 0;
 
-	if(!cmds)
-		return(0);
 	while(cmds[i])
 	{
 		if(cmds[i + 1])
@@ -97,7 +95,7 @@ int    picoshell(char **cmds[])
 		{
 			if (WIFEXITED(status) && (WEXITSTATUS(status) != 0))
 				result = 1;
-			if (!WIFEXITED(status))
+			else if (!WIFEXITED(status))
 				result = 1;
 		}
 		return (result);
