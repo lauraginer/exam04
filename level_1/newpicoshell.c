@@ -54,10 +54,30 @@ int    picoshell(char **cmds[])
 		}
 		if(pid == 0)//proceso hijo
 		{
-			//aqui debemos de ejecutar los comandos y redirigir el fd[1](escritura)
+			if(up_fd != 0)
+			{
+				if(dup2(up_fd, 0) == -1)
+					exit(1);
+				close(up_fd);
+			}
+			if(pipe_fd[1] != -1)
+			{
+				if(dup2(pipe_fd, 1) == -1)
+					exit(1);
+				close(pipe_fd[0]);
+				close(pipe_fd[1]);
+			}
+			execvp(cmds[i][0], cmds[i]);
+			exit(1);
 		}
 		if(pid > 0)//proceso padre
 		{
+			if(up_fd != 0)
+				close(up_fd);
+			if(pipe_fd[1] != -1)
+				close(pipe_fd[1]);
+			up_fd = pipe_fd[0];
+			i++;
 			//se realizan comprobaciones para poder cerrar por completo los procesos hijos
 		}
 		while(wait(&status) > 0)

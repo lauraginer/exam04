@@ -69,12 +69,10 @@ int    picoshell(char **cmds[])
 					exit(1);
 				close(up_fd);
 			}
-			if(pipe_fd[1] == -1)
+			if(pipe_fd[1] != -1)
 			{
 				if(dup2(pipe_fd[1], 1) == -1)
-				{
 					exit(1);
-				}
 				close(pipe_fd[0]);
 				close(pipe_fd[1]);
 			}
@@ -98,8 +96,8 @@ int    picoshell(char **cmds[])
 			else if (!WIFEXITED(status))
 				result = 1;
 		}
-		return (result);
-}
+	}
+	return (result);
 }
 //man 2 wait
 //man pipe- estructura pipe funcional
