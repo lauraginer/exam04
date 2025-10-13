@@ -57,11 +57,13 @@ void	free_cmds(char **cmds[])
 		}
 		free(cmds[i]);
 	}
-	free(cmds);
+	// No liberar cmds ya que es un array en la pila (stack)
 }
 
 int	main(int argc, char *argv[])
 {
+	(void)argc;
+	(void)argv;
 	// Test 1: ls | grep .c
 	printf("Test 1: ls | grep .c\n");
 	char **test1_cmds[3];

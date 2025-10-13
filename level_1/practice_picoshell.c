@@ -1,0 +1,95 @@
+/*Cmds contiene una lista de comandos válidos terminada en NULL. Cada fila
+de cmds es un array argv directamente utilizable para una llamada a execvp. El primer
+argumento de cada comando es el nombre del comando o ruta y puede pasarse
+directamente como primer argumento de execvp.
+
+Si ocurre cualquier error, la función debe devolver 1 (por supuesto, debes
+cerrar todos los descriptores de archivo abiertos antes). De lo contrario,
+	la función debe esperar a todos los procesos
+hijos y devolver 0. Encontrarás en este directorio un archivo main.c que
+contiene algo para ayudarte a probar tu función.
+
+Ejemplos:
+./picoshell /bin/ls "|" /usr/bin/grep picoshell
+picoshell
+./picoshell echo 'squalala' "|" cat "|" sed 's/a/b/g'
+squblblb/
+
+Funciones permitidas:    close, fork, wait, exit, execvp, dup2, pipe
+*/
+
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int	picoshell(char **cmds[])
+{
+	int pipe_fd[2];
+	pid_t pid;
+	int i = 0;
+	int status;
+	int result = 0;
+	int up_fd = 0;
+
+	while (cmds[i])
+	{
+		if (cmds[i + 1])
+		{
+			if (pipe(pipe_fd) == -1)
+				return (1);
+		}
+		else
+		{
+			pipe_fd[0] = -1;
+			pipe_fd[1] = -1;
+		}
+		pid = fork();
+		if (pid < 0)
+		{
+			if (pipe_fd[0] != -1)
+				close(pipe_fd[0]);
+			if (pipe_fd[1] != -1)
+				close(pipe_fd[1]);
+			if (up_fd != 0)
+				close(up_fd);
+			return (1);
+		}
+		if (pid == 0)
+		{
+			if (up_fd != 0)
+			{
+				if (dup2(up_fd, 0) == -1)
+					exit(1);
+				close(up_fd);
+			}
+			if (pipe_fd[1] != -1)
+			{
+				if (dup2(pipe_fd[1], 1) == -1)
+					exit(1);
+				close(pipe_fd[0]);
+				close(pipe_fd[1]);
+			}
+			execvp(cmds[i][0], cmds[i]);
+			exit(1);
+		}
+		else // Proceso padre
+		{
+			if (up_fd != 0)
+				close(up_fd);
+			if (pipe_fd[1] != -1)
+				close(pipe_fd[1]); // Solo cerramos el extremo de escritura
+			up_fd = pipe_fd[0];   
+				// Guardamos el extremo de lectura para el siguiente comando
+			i++;
+		}
+	}
+	while (wait(&status) > 0)
+	{
+		if (WIFEXITED(status) && (WEXITSTATUS(status) != 0))
+			result = 1;
+		if (!WIFEXITED(status))
+			result = 1;
+	}
+	return (result);
+}
