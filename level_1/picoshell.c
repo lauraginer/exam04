@@ -68,7 +68,7 @@ int    picoshell(char **cmds[])
 		{
 			if(up_fd != 0)
 			{
-				if(dup2(up_fd, 0) == -1)
+				if(dup2(up_fd, 0) == -1) //IMPORTANTE MANEJAR EL ERROR CON EXIT
 					exit(1);
 				close(up_fd);
 			}
