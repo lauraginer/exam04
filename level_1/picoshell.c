@@ -90,14 +90,14 @@ int    picoshell(char **cmds[])
 				close(pipe_fd[1]); //solo cerramos el extremo de escritura
 			up_fd = pipe_fd[0];
 			i++;
-			//se realizan comprobaciones para poder cerrar por completo los procesos hijos
+			//se realizan comprobaciones para poder cerrar por completo los procesos hijos e iterar
 		}
 	}
 	while(wait(&status) > 0)
 	{
 		if(WIFEXITED(status) && (WEXITSTATUS(status) != 0)) //si el proceso hijo ha terminado bien y el codigo de status es diferente a 0
 			result = 1;
-		if(!WIFEXITED(status))
+		else if(!WIFEXITED(status))
 			result = 1;
 			//se controlan las señales
 	}

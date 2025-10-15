@@ -37,7 +37,7 @@ int	ft_popen(const char *file, char *const argv[], int type)
 	if (pipe(pipe_fd) == -1)
 		return (-1);
 	pid = fork();
-	if (pid < 0) //eliminé el punto y coma que causaba un error
+	if (pid < 0)
 	{
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
@@ -72,7 +72,7 @@ int	ft_popen(const char *file, char *const argv[], int type)
 		else
 		{
 			close(pipe_fd[0]);
-			return (pipe_fd[1]);
+			return (pipe_fd[1]); //retornamos el fd, como se nos pide en el subject
 		}
 	}
 }
