@@ -24,7 +24,7 @@ int	main(void) {
 Pista: ¡No dejes descriptores de archivo abiertos!*/
 
 #include <stdlib.h>
-#include <sys/types.h>
+//#include <sys/types.h>
 #include <unistd.h>
 
 int	ft_popen(const char *file, char *const argv[], int type)
